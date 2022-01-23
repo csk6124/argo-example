@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.metadata.name }}
+  namespace: {{ .Values.namespace.name }}
+spec:
+  replicas: {{ .Values.replicas.count }}
+  revisionHistoryLimit: {{ .Values.replicas.revisionHistoryLimit }} # replicasets retain rollback number
+  selector:
+    matchLabels:
+      app: {{ .Values.metadata.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.metadata.name }}
+        env: {{ .Values.labels.env }}
+        cluster: {{ .Values.labels.env }}-{{ .Values.labels.cluster }}
+    spec:
+      imagePullSecrets:
+        - name: {{ .Values.image.imagePullSecrets }}
+      containers:
+      - name: {{ .Values.metadata.name }}
+        image: {{ .Values.image.repository }}/{{ .Values.namespace.name }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.service.http }}
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.service.http }}
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        envFrom:
+        - configMapRef:
+            name: api
+        resources: 
+          limits: 
+            cpu: 50m 
+            memory: 32Mi
+          requests: 
+            cpu: 50m 
+            memory: 32Mi

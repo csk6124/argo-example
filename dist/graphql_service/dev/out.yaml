@@ -1,0 +1,65 @@
+---
+# Source: graphql_service/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: graphql_service
+  namespace: myapp
+spec:
+  type: ClusterIP
+  sessionAffinity: ClientIP
+  ports:
+  - name: http
+    port: 9999
+    protocol: TCP
+    targetPort: 9999
+  selector:
+    app: graphql_service
+---
+# Source: graphql_service/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: graphql_service
+  namespace: myapp
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1 # replicasets retain rollback number
+  selector:
+    matchLabels:
+      app: graphql_service
+  template:
+    metadata:
+      labels:
+        app: graphql_service
+        env: dev
+        cluster: dev-walter
+    spec:
+      imagePullSecrets:
+        - name: ap-northeast-2-ecr-registry
+      containers:
+      - name: graphql_service
+        image: xxxxx.dkr.ecr.ap-northeast-2.amazonaws.com/myapp:latest
+        imagePullPolicy: Always
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 9999
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 9999
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        envFrom:
+        - configMapRef:
+            name: api
+        resources: 
+          limits: 
+            cpu: 50m 
+            memory: 32Mi
+          requests: 
+            cpu: 50m 
+            memory: 32Mi

@@ -1,0 +1,6 @@
+version: 1.0.0
+apiVersion: v1
+name: graphql_service
+description: Helm chart
+source:
+  - https://github.com/csk6124/argo-example

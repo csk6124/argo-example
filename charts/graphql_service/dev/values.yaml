@@ -1,0 +1,28 @@
+namespace:
+  name: 'myapp'
+
+metadata:
+  name: 'graphql_service'
+
+labels:
+  env: 'dev'
+  cluster: 'walter'
+
+image:
+  tag: latest
+  repository: xxxxx.dkr.ecr.ap-northeast-2.amazonaws.com
+  imagePullPolicy: Always
+  imagePullSecrets: ap-northeast-2-ecr-registry
+
+service:
+  http: 9999
+  targetHttp: 9999
+
+ingress:
+  host: dev-apiv1
+  domain: walter.com
+  targetHttp: 9999
+
+replicas:
+  count: 1
+  revisionHistoryLimit: 1
