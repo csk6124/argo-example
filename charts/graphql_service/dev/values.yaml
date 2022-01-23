@@ -18,11 +18,6 @@ service:
   http: 9999
   targetHttp: 9999
 
-ingress:
-  host: dev-apiv1
-  domain: walter.com
-  targetHttp: 9999
-
 replicas:
   count: 1
   revisionHistoryLimit: 1
